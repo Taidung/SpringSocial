@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 @Entity
@@ -98,9 +99,10 @@ public class Post {
     @PrePersist
     public void handleBeforeCreate() {
         this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
     }
 
-    @PrePersist
+    @PreUpdate
     public void handleBeforeUpdate() {
         this.updatedAt = Instant.now();
     }
