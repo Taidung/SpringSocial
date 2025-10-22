@@ -1,10 +1,11 @@
 package vn.taidung.springsocial.service;
 
+import java.util.Optional;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import vn.taidung.springsocial.model.Post;
-import vn.taidung.springsocial.model.User;
 import vn.taidung.springsocial.model.request.CreatePostRequest;
 import vn.taidung.springsocial.repository.PostRepository;
 
@@ -20,9 +21,11 @@ public class PostService {
 
     public Post createPostHandler(CreatePostRequest postRequest) {
         Post post = modelMapper.map(postRequest, Post.class);
-        User user = new User();
-        user.setId(2L);
-        post.setUser(user);
-        return postRepository.save(post);
+        return this.postRepository.save(post);
     }
+
+    public Optional<Post> getPostHandler(Long id) {
+        return postRepository.findById(id);
+    }
+
 }

@@ -1,5 +1,9 @@
 package vn.taidung.springsocial.controller;
 
+import java.util.Optional;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,5 +25,10 @@ public class PostController {
     @PostMapping("/posts")
     public Post createPost(@RequestBody CreatePostRequest postRequest) {
         return postService.createPostHandler(postRequest);
+    }
+
+    @GetMapping("/posts/{id}")
+    public Optional<Post> getPost(@PathVariable Long id) {
+        return postService.getPostHandler(id);
     }
 }

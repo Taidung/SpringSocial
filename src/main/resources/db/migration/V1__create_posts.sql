@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS posts (
+    id BIGSERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    tags VARCHAR(100) [],
+    created_at TIMESTAMP(0) WITH TIME ZONE NOT NULL,
+    updated_at TIMESTAMP(0) WITH TIME ZONE NOT NULL
+);
