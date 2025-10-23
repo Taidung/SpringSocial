@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import vn.taidung.springsocial.model.Post;
 import vn.taidung.springsocial.model.request.CreatePostRequest;
 import vn.taidung.springsocial.model.request.UpdatePostRequest;
@@ -21,6 +24,7 @@ import vn.taidung.springsocial.util.errors.PostNotFoundException;
 
 @RestController
 @RequestMapping("/v1")
+@Validated
 public class PostController {
     private final PostService postService;
 
@@ -29,13 +33,14 @@ public class PostController {
     }
 
     @PostMapping("/posts")
-    public ResponseEntity<Post> createPost(@RequestBody CreatePostRequest postRequest) {
+    public ResponseEntity<Post> createPost(@RequestBody @Valid CreatePostRequest postRequest) {
         Post post = this.postService.createPostHandler(postRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(post);
     }
 
     @GetMapping("/posts/{id}")
-    public ResponseEntity<Post> getPost(@PathVariable Long id) {
+    public ResponseEntity<Post> getPost(
+            @PathVariable @Positive(message = "Post ID must be greater than zero") Long id) {
         Post post = this.postService.getPostHandler(id);
         if (post == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -45,7 +50,8 @@ public class PostController {
     }
 
     @DeleteMapping("/posts/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long id) {
+    public ResponseEntity<Void> deletePost(
+            @PathVariable @Positive(message = "Post ID must be greater than zero") Long id) {
         try {
             this.postService.deletePostHandler(id);
             return ResponseEntity.noContent().build();
@@ -55,7 +61,9 @@ public class PostController {
     }
 
     @PatchMapping("/posts/{id}")
-    public ResponseEntity<Post> updatePost(@PathVariable Long id, @RequestBody UpdatePostRequest postRequest) {
+    public ResponseEntity<Post> updatePost(
+            @PathVariable @Positive(message = "Post ID must be greater than zero") Long id,
+            @RequestBody UpdatePostRequest postRequest) {
         try {
             Post post = this.postService.updatePostHandler(id, postRequest);
             return ResponseEntity.ok(post);

@@ -1,12 +1,14 @@
 package vn.taidung.springsocial.model.response;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ErrorResponse {
     private Instant timestamp;
     private int status;
     private String path;
-    private String error;
+    private List<String> errors = new ArrayList<>();
 
     public Instant getTimestamp() {
         return timestamp;
@@ -32,12 +34,16 @@ public class ErrorResponse {
         this.path = path;
     }
 
-    public String getError() {
-        return error;
+    public List<String> getErrors() {
+        return errors;
     }
 
-    public void setError(String error) {
-        this.error = error;
+    public void setErrors(List<String> errors) {
+        this.errors = errors;
+    }
+
+    public void addError(String error) {
+        this.errors.add(error);
     }
 
 }
