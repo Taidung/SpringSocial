@@ -6,7 +6,6 @@ import java.util.List;
 
 public class ErrorResponse {
     private Instant timestamp;
-    private int status;
     private String path;
     private List<String> errors = new ArrayList<>();
 
@@ -16,14 +15,6 @@ public class ErrorResponse {
 
     public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
     }
 
     public String getPath() {

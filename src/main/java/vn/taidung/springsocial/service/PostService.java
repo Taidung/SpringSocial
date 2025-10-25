@@ -1,5 +1,6 @@
 package vn.taidung.springsocial.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -9,6 +10,9 @@ import jakarta.transaction.Transactional;
 import vn.taidung.springsocial.model.Post;
 import vn.taidung.springsocial.model.request.CreatePostRequest;
 import vn.taidung.springsocial.model.request.UpdatePostRequest;
+import vn.taidung.springsocial.model.response.CommentResponse;
+import vn.taidung.springsocial.model.response.PostResponse;
+import vn.taidung.springsocial.repository.CommentRepository;
 import vn.taidung.springsocial.repository.PostRepository;
 import vn.taidung.springsocial.util.errors.PostNotFoundException;
 
@@ -16,26 +20,35 @@ import vn.taidung.springsocial.util.errors.PostNotFoundException;
 public class PostService {
     private final PostRepository postRepository;
     private final ModelMapper modelMapper;
+    private final CommentRepository commentRepository;
 
-    public PostService(PostRepository postRepository, ModelMapper modelMapper) {
+    public PostService(PostRepository postRepository, ModelMapper modelMapper, CommentRepository commentRepository) {
         this.postRepository = postRepository;
         this.modelMapper = modelMapper;
+        this.commentRepository = commentRepository;
     }
 
     @Transactional
-    public Post createPostHandler(CreatePostRequest postRequest) {
+    public PostResponse createPostHandler(CreatePostRequest postRequest) {
         Post post = this.modelMapper.map(postRequest, Post.class);
-        return this.postRepository.save(post);
+        this.postRepository.save(post);
+        return this.modelMapper.map(post, PostResponse.class);
     }
 
-    public Post getPostHandler(Long id) {
+    public PostResponse getPostHandler(Long id) throws PostNotFoundException {
         Optional<Post> optionalPost = this.postRepository.findById(id);
-        if (optionalPost.isPresent()) {
-            return optionalPost.get();
+        if (!optionalPost.isPresent()) {
+            throw new PostNotFoundException("post not found");
         }
-        return null;
+        Post post = optionalPost.get();
+        List<CommentResponse> comments = this.commentRepository.findAllByPostId(post.getId());
+        PostResponse postResponse = modelMapper.map(post, PostResponse.class);
+        postResponse.setComments(comments);
+
+        return postResponse;
     }
 
+    @Transactional
     public void deletePostHandler(Long id) throws PostNotFoundException {
         if (!this.postRepository.existsById(id)) {
             throw new PostNotFoundException("post not found");
@@ -44,22 +57,23 @@ public class PostService {
         this.postRepository.deleteById(id);
     }
 
-    public Post updatePostHandler(Long id, UpdatePostRequest updatePostRequest) throws PostNotFoundException {
+    @Transactional
+    public PostResponse updatePostHandler(Long id, UpdatePostRequest updatePostRequest) throws PostNotFoundException {
         Optional<Post> optionalPost = this.postRepository.findById(id);
-        if (optionalPost.isPresent()) {
-            Post post = this.modelMapper.map(optionalPost.get(), Post.class);
-
-            if (updatePostRequest.getTitle() != null) {
-                post.setTitle(updatePostRequest.getTitle());
-            }
-
-            if (updatePostRequest.getContent() != null) {
-                post.setContent(updatePostRequest.getContent());
-            }
-            return this.postRepository.save(post);
-        } else {
-            throw new PostNotFoundException("Post not found");
+        if (!optionalPost.isPresent()) {
+            throw new PostNotFoundException("post not found");
         }
+        Post post = optionalPost.get();
+
+        if (updatePostRequest.getTitle() != null) {
+            post.setTitle(updatePostRequest.getTitle());
+        }
+
+        if (updatePostRequest.getContent() != null) {
+            post.setContent(updatePostRequest.getContent());
+        }
+        this.postRepository.save(post);
+        return this.modelMapper.map(post, PostResponse.class);
     }
 
 }

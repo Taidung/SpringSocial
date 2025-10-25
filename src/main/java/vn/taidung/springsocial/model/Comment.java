@@ -11,17 +11,19 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "users")
-public class User {
+@Table(name = "comments")
+public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String username;
-    private String email;
-    private String password;
 
-    @Column(name = "created_at")
+    @Column(name = "post_id")
+    private Long postId;
+
+    @Column(name = "user_id")
+    private Long userId;
+    private String content;
     private Instant createdAt;
 
     public Long getId() {
@@ -32,28 +34,28 @@ public class User {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
+    public Long getPostId() {
+        return postId;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setPostId(Long postId) {
+        this.postId = postId;
     }
 
-    public String getEmail() {
-        return email;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
-    public String getPassword() {
-        return password;
+    public String getContent() {
+        return content;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public Instant getCreatedAt() {
@@ -68,4 +70,5 @@ public class User {
     public void handleBeforeCreate() {
         this.createdAt = Instant.now();
     }
+
 }

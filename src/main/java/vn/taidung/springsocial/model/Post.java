@@ -4,16 +4,21 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-// import jakarta.persistence.JoinColumn;
-// import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import jakarta.persistence.Version;
 
 @Entity
 @Table(name = "posts")
@@ -36,9 +41,14 @@ public class Post {
     @Column(columnDefinition = "text[]")
     private List<String> tags = new ArrayList<>();
 
-    // @ManyToOne
-    // @JoinColumn(name = "user_id")
-    // private User user;
+    @Column(name = "user_id")
+    private Long userId;
+
+    @Transient
+    private List<Comment> comments = new ArrayList<>();
+
+    @Version
+    private Long version;
 
     public Long getId() {
         return id;
@@ -88,13 +98,29 @@ public class Post {
         this.tags = tags;
     }
 
-    // public User getUser() {
-    // return user;
-    // }
+    public Long getUserId() {
+        return userId;
+    }
 
-    // public void setUser(User user) {
-    // this.user = user;
-    // }
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
 
     @PrePersist
     public void handleBeforeCreate() {

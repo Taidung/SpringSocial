@@ -7,5 +7,4 @@ import vn.taidung.springsocial.model.Post;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
-
 }

@@ -16,10 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import vn.taidung.springsocial.model.Post;
 import vn.taidung.springsocial.model.request.CreatePostRequest;
 import vn.taidung.springsocial.model.request.UpdatePostRequest;
+import vn.taidung.springsocial.model.response.PostResponse;
 import vn.taidung.springsocial.service.PostService;
+import vn.taidung.springsocial.util.annotation.ApiMessage;
 import vn.taidung.springsocial.util.errors.PostNotFoundException;
 
 @RestController
@@ -33,42 +34,34 @@ public class PostController {
     }
 
     @PostMapping("/posts")
-    public ResponseEntity<Post> createPost(@RequestBody @Valid CreatePostRequest postRequest) {
-        Post post = this.postService.createPostHandler(postRequest);
+    @ApiMessage("Create a post")
+    public ResponseEntity<PostResponse> createPost(@RequestBody @Valid CreatePostRequest postRequest) {
+        PostResponse post = this.postService.createPostHandler(postRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(post);
     }
 
     @GetMapping("/posts/{id}")
-    public ResponseEntity<Post> getPost(
+    @ApiMessage("Get a post by ID")
+    public ResponseEntity<PostResponse> getPost(
             @PathVariable @Positive(message = "Post ID must be greater than zero") Long id) {
-        Post post = this.postService.getPostHandler(id);
-        if (post == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-
-        return ResponseEntity.ok(post);
+        PostResponse postResponse = this.postService.getPostHandler(id);
+        return ResponseEntity.ok(postResponse);
     }
 
     @DeleteMapping("/posts/{id}")
+    @ApiMessage("Delete a post")
     public ResponseEntity<Void> deletePost(
             @PathVariable @Positive(message = "Post ID must be greater than zero") Long id) {
-        try {
-            this.postService.deletePostHandler(id);
-            return ResponseEntity.noContent().build();
-        } catch (PostNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        this.postService.deletePostHandler(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/posts/{id}")
-    public ResponseEntity<Post> updatePost(
+    @ApiMessage("Update a post")
+    public ResponseEntity<PostResponse> updatePost(
             @PathVariable @Positive(message = "Post ID must be greater than zero") Long id,
             @RequestBody UpdatePostRequest postRequest) {
-        try {
-            Post post = this.postService.updatePostHandler(id, postRequest);
-            return ResponseEntity.ok(post);
-        } catch (PostNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        PostResponse post = this.postService.updatePostHandler(id, postRequest);
+        return ResponseEntity.ok(post);
     }
 }
