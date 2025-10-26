@@ -1,7 +1,5 @@
 package vn.taidung.springsocial.controller;
 
-import java.util.Optional;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -16,21 +14,26 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import vn.taidung.springsocial.model.Comment;
+import vn.taidung.springsocial.model.request.CreateCommentRequest;
 import vn.taidung.springsocial.model.request.CreatePostRequest;
 import vn.taidung.springsocial.model.request.UpdatePostRequest;
+import vn.taidung.springsocial.model.response.CommentResponse;
 import vn.taidung.springsocial.model.response.PostResponse;
+import vn.taidung.springsocial.service.CommentService;
 import vn.taidung.springsocial.service.PostService;
 import vn.taidung.springsocial.util.annotation.ApiMessage;
-import vn.taidung.springsocial.util.errors.PostNotFoundException;
 
 @RestController
 @RequestMapping("/v1")
 @Validated
 public class PostController {
     private final PostService postService;
+    private final CommentService commentService;
 
-    public PostController(PostService postService) {
+    public PostController(PostService postService, CommentService commentService) {
         this.postService = postService;
+        this.commentService = commentService;
     }
 
     @PostMapping("/posts")
@@ -63,5 +66,14 @@ public class PostController {
             @RequestBody UpdatePostRequest postRequest) {
         PostResponse post = this.postService.updatePostHandler(id, postRequest);
         return ResponseEntity.ok(post);
+    }
+
+    @PostMapping("/posts/{id}/comments")
+    @ApiMessage("Add a comment to a post")
+    public ResponseEntity<CommentResponse> createComment(
+            @PathVariable @Positive(message = "Post ID must be greater than zero") Long id,
+            @RequestBody @Valid CreateCommentRequest commentRequest) {
+        CommentResponse commentResponse = this.commentService.createCommentHandler(commentRequest, id);
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentResponse);
     }
 }
