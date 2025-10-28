@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import vn.taidung.springsocial.model.Comment;
 import vn.taidung.springsocial.model.request.CreateCommentRequest;
 import vn.taidung.springsocial.model.request.CreatePostRequest;
 import vn.taidung.springsocial.model.request.UpdatePostRequest;

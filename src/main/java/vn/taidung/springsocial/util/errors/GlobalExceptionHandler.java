@@ -79,9 +79,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 
-    @ExceptionHandler(PostNotFoundException.class)
+    @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<RestResponse<Object>> handlePostNotFoundException(HttpServletRequest request,
-            PostNotFoundException ex) {
+            NotFoundException ex) {
         ErrorResponse error = new ErrorResponse();
         error.setTimestamp(Instant.now());
         error.setPath(request.getServletPath());
@@ -95,5 +95,23 @@ public class GlobalExceptionHandler {
         LOGGER.error(ex.getMessage(), ex);
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<RestResponse<Object>> handleConflictException(HttpServletRequest request,
+            ConflictException ex) {
+        ErrorResponse error = new ErrorResponse();
+        error.setTimestamp(Instant.now());
+        error.setPath(request.getServletPath());
+        error.addError(ex.getMessage());
+
+        RestResponse<Object> res = new RestResponse<Object>();
+        res.setStatusCode(HttpStatus.CONFLICT.value());
+        res.setErrors(error);
+        res.setMessage("Resource conflict");
+
+        LOGGER.error(ex.getMessage(), ex);
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(res);
     }
 }

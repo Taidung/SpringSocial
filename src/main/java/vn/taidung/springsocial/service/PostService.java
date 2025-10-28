@@ -14,7 +14,7 @@ import vn.taidung.springsocial.model.response.CommentResponse;
 import vn.taidung.springsocial.model.response.PostResponse;
 import vn.taidung.springsocial.repository.CommentRepository;
 import vn.taidung.springsocial.repository.PostRepository;
-import vn.taidung.springsocial.util.errors.PostNotFoundException;
+import vn.taidung.springsocial.util.errors.NotFoundException;
 
 @Service
 public class PostService {
@@ -35,10 +35,10 @@ public class PostService {
         return this.modelMapper.map(post, PostResponse.class);
     }
 
-    public PostResponse getPostHandler(Long id) throws PostNotFoundException {
+    public PostResponse getPostHandler(Long id) throws NotFoundException {
         Optional<Post> optionalPost = this.postRepository.findById(id);
         if (!optionalPost.isPresent()) {
-            throw new PostNotFoundException("post not found");
+            throw new NotFoundException("post not found");
         }
         Post post = optionalPost.get();
         List<CommentResponse> comments = this.commentRepository.findAllByPostId(post.getId());
@@ -49,19 +49,19 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePostHandler(Long id) throws PostNotFoundException {
+    public void deletePostHandler(Long id) throws NotFoundException {
         if (!this.postRepository.existsById(id)) {
-            throw new PostNotFoundException("post not found");
+            throw new NotFoundException("post not found");
         }
 
         this.postRepository.deleteById(id);
     }
 
     @Transactional
-    public PostResponse updatePostHandler(Long id, UpdatePostRequest updatePostRequest) throws PostNotFoundException {
+    public PostResponse updatePostHandler(Long id, UpdatePostRequest updatePostRequest) throws NotFoundException {
         Optional<Post> optionalPost = this.postRepository.findById(id);
         if (!optionalPost.isPresent()) {
-            throw new PostNotFoundException("post not found");
+            throw new NotFoundException("post not found");
         }
         Post post = optionalPost.get();
 

@@ -12,7 +12,7 @@ import vn.taidung.springsocial.model.response.UserResponse;
 import vn.taidung.springsocial.repository.CommentRepository;
 import vn.taidung.springsocial.repository.PostRepository;
 import vn.taidung.springsocial.repository.UserRepository;
-import vn.taidung.springsocial.util.errors.PostNotFoundException;
+import vn.taidung.springsocial.util.errors.NotFoundException;
 
 @Service
 public class CommentService {
@@ -33,7 +33,7 @@ public class CommentService {
     @Transactional
     public CommentResponse createCommentHandler(CreateCommentRequest commentRequest, Long postId) {
         if (!this.postRepository.existsById(postId)) {
-            throw new PostNotFoundException("post not found");
+            throw new NotFoundException("post not found");
         }
 
         Comment comment = new Comment();
