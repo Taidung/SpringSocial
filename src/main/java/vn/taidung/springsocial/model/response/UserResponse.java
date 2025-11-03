@@ -3,15 +3,13 @@ package vn.taidung.springsocial.model.response;
 public class UserResponse {
     private Long id;
     private String username;
-    private String email;
 
     public UserResponse() {
     }
 
-    public UserResponse(Long id, String username, String email) {
+    public UserResponse(Long id, String username) {
         this.id = id;
         this.username = username;
-        this.email = email;
     }
 
     public Long getId() {
@@ -29,13 +27,4 @@ public class UserResponse {
     public void setUsername(String username) {
         this.username = username;
     }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
 }

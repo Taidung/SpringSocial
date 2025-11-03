@@ -44,7 +44,7 @@ public class CommentService {
 
         User user = this.userRepository.findById(commentRequest.getUserId()).get();
         CommentResponse response = this.modelMapper.map(comment, CommentResponse.class);
-        response.setUser(new UserResponse(user.getId(), user.getUsername(), user.getEmail()));
+        response.setUser(new UserResponse(user.getId(), user.getUsername()));
         return response;
     }
 }

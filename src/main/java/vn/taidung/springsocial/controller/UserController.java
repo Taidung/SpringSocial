@@ -1,6 +1,7 @@
 package vn.taidung.springsocial.controller;
 
-import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.constraints.Positive;
 import vn.taidung.springsocial.model.request.FollowUserRequest;
+import vn.taidung.springsocial.model.response.PostWithMetadata;
 import vn.taidung.springsocial.model.response.UserResponse;
+import vn.taidung.springsocial.service.FeedService;
 import vn.taidung.springsocial.service.FollowerService;
 import vn.taidung.springsocial.service.UserService;
 import vn.taidung.springsocial.util.annotation.ApiMessage;
@@ -24,10 +27,12 @@ public class UserController {
 
     private final UserService userService;
     private final FollowerService followerService;
+    private final FeedService feedService;
 
-    public UserController(UserService userService, FollowerService followerService) {
+    public UserController(UserService userService, FollowerService followerService, FeedService feedService) {
         this.userService = userService;
         this.followerService = followerService;
+        this.feedService = feedService;
     }
 
     @GetMapping("/users/{id}")
@@ -54,5 +59,13 @@ public class UserController {
             @PathVariable @Positive(message = "ID must be greater than zero") Long id) {
         this.followerService.unfollowUser(id, followUserRequest);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/users/{id}/feed")
+    @ApiMessage("Get user feed")
+    public ResponseEntity<List<PostWithMetadata>> getUserFeed(
+            @PathVariable @Positive(message = "User ID must be greater than zero") Long id) {
+        List<PostWithMetadata> feed = this.feedService.getUserFeedHandler(id);
+        return ResponseEntity.ok(feed);
     }
 }

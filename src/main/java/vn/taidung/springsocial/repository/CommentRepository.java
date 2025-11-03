@@ -16,7 +16,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("""
             SELECT new vn.taidung.springsocial.model.response.CommentResponse(
                 c.id, c.postId, c.userId, c.content,
-                u.id, u.username, u.email
+                u.id, u.username
             )
             FROM Comment c
             JOIN User u ON c.userId = u.id

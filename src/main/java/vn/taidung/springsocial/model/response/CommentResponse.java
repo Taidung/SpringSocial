@@ -11,12 +11,12 @@ public class CommentResponse {
     }
 
     public CommentResponse(Long id, Long postId, Long userId, String content, Long uId,
-            String username, String email) {
+            String username) {
         this.id = id;
         this.postId = postId;
         this.userId = userId;
         this.content = content;
-        this.user = new UserResponse(userId, username, email);
+        this.user = new UserResponse(userId, username);
     }
 
     public Long getId() {
