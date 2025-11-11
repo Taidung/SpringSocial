@@ -1,7 +1,7 @@
 package vn.taidung.springsocial.repository;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,10 +26,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             FROM Post p
             LEFT JOIN User u ON u.id = p.userId
             LEFT JOIN Comment c ON c.postId = p.id
-            LEFT JOIN Follower f ON f.id.followerId = p.userId
+            LEFT JOIN Follower f ON f.id.followerId = p.userId OR p.userId = :userId
             WHERE f.id.userId = :userId OR p.userId = :userId
             GROUP BY p.id, u.id, u.username
             ORDER BY p.createdAt DESC
             """)
-    List<PostWithMetadata> getUserFeed(@Param("userId") Long userId);
+    Page<PostWithMetadata> getUserFeed(@Param("userId") Long userId, Pageable pageable);
 }
