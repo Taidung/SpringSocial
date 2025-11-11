@@ -18,8 +18,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                 p.id,
                 p.title,
                 p.content,
+                p.createdAt,
                 p.tags,
-                u.id,
+                p.userId,
                 u.username,
                 COUNT(c.id)
             )
@@ -28,8 +29,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             LEFT JOIN Comment c ON c.postId = p.id
             LEFT JOIN Follower f ON f.id.followerId = p.userId OR p.userId = :userId
             WHERE f.id.userId = :userId OR p.userId = :userId
-            GROUP BY p.id, u.id, u.username
-            ORDER BY p.createdAt DESC
+            GROUP BY p.id, u.username
             """)
     Page<PostWithMetadata> getUserFeed(@Param("userId") Long userId, Pageable pageable);
 }

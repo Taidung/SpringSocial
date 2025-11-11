@@ -51,6 +51,5 @@ public class FollowerService {
         FollowerId id = new FollowerId(followUserRequest.getUserId(), followerId);
 
         followerRepository.deleteById(id);
-        ;
     }
 }

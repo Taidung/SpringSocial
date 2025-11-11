@@ -1,11 +1,13 @@
 package vn.taidung.springsocial.model.response;
 
+import java.time.Instant;
 import java.util.List;
 
 public class PostWithMetadata {
     private Long id;
     private String title;
     private String content;
+    private Instant createdAt;
     private List<String> tags;
     private UserResponse user;
     private Long commentsCount;
@@ -13,11 +15,12 @@ public class PostWithMetadata {
     public PostWithMetadata() {
     }
 
-    public PostWithMetadata(Long id, String title, String content, List<String> tags,
+    public PostWithMetadata(Long id, String title, String content, Instant createdAt, List<String> tags,
             Long userId, String username, Long commentsCount) {
         this.id = id;
         this.title = title;
         this.content = content;
+        this.createdAt = createdAt;
         this.tags = tags;
         this.user = new UserResponse(userId, username);
         this.commentsCount = commentsCount;
@@ -69,6 +72,14 @@ public class PostWithMetadata {
 
     public void setCommentsCount(Long commentsCount) {
         this.commentsCount = commentsCount;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
 }
