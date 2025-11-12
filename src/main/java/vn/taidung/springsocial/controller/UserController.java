@@ -2,6 +2,7 @@ package vn.taidung.springsocial.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import vn.taidung.springsocial.model.request.FollowUserRequest;
+import vn.taidung.springsocial.model.request.FollowerRequest;
 import vn.taidung.springsocial.model.request.PostFeedFilter;
 import vn.taidung.springsocial.model.response.PostWithMetadata;
 import vn.taidung.springsocial.model.response.UserResponse;
@@ -53,7 +54,7 @@ public class UserController {
     @PutMapping("/users/{id}/follow")
     @ApiMessage("Follow a user")
     public ResponseEntity<Void> followUser(
-            @RequestBody FollowUserRequest followUserRequest,
+            @RequestBody FollowerRequest followUserRequest,
             @PathVariable @Positive(message = "ID must be greater than zero") Long id) {
         this.followerService.followUser(id, followUserRequest);
         return ResponseEntity.noContent().build();
@@ -62,7 +63,7 @@ public class UserController {
     @PutMapping("/users/{id}/unfollow")
     @ApiMessage("Unfollow a user")
     public ResponseEntity<Void> unfollowUser(
-            @RequestBody FollowUserRequest followUserRequest,
+            @RequestBody FollowerRequest followUserRequest,
             @PathVariable @Positive(message = "ID must be greater than zero") Long id) {
         this.followerService.unfollowUser(id, followUserRequest);
         return ResponseEntity.noContent().build();
@@ -72,16 +73,9 @@ public class UserController {
     @ApiMessage("Get user feed")
     public ResponseEntity<List<PostWithMetadata>> getUserFeed(
             @PathVariable @Positive(message = "User ID must be greater than zero") Long id,
-            @Valid @ModelAttribute PostFeedFilter postFeedFilter) {
+            @Valid @ModelAttribute PostFeedFilter filter) {
 
-        Pageable pageable = PageRequest.of(
-                postFeedFilter.getPageNumber(),
-                postFeedFilter.getPageSize(),
-                postFeedFilter.getSort().equalsIgnoreCase("asc")
-                        ? Sort.by("createdAt").ascending()
-                        : Sort.by("createdAt").descending());
-
-        List<PostWithMetadata> feed = this.feedService.getUserFeedHandler(id, pageable);
-        return ResponseEntity.ok(feed);
+        Page<PostWithMetadata> feed = this.feedService.getUserFeedHandler(id, filter);
+        return ResponseEntity.ok(feed.getContent());
     }
 }

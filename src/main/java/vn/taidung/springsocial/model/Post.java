@@ -28,7 +28,6 @@ public class Post {
 
     private String title;
 
-    @Column(columnDefinition = "text[]")
     private List<String> tags = new ArrayList<>();
 
     @Column(name = "created_at")

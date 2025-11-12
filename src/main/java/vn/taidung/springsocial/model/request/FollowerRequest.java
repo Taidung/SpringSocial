@@ -1,6 +1,6 @@
 package vn.taidung.springsocial.model.request;
 
-public class FollowUserRequest {
+public class FollowerRequest {
 
     private Long userId;
 

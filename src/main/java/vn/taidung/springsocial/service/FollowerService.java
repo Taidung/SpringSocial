@@ -8,7 +8,7 @@ import jakarta.transaction.Transactional;
 import vn.taidung.springsocial.model.Follower;
 import vn.taidung.springsocial.model.FollowerId;
 import vn.taidung.springsocial.model.User;
-import vn.taidung.springsocial.model.request.FollowUserRequest;
+import vn.taidung.springsocial.model.request.FollowerRequest;
 import vn.taidung.springsocial.repository.FollowerRepository;
 import vn.taidung.springsocial.repository.UserRepository;
 import vn.taidung.springsocial.util.errors.ConflictException;
@@ -25,14 +25,18 @@ public class FollowerService {
     }
 
     @Transactional
-    public void followUser(Long followerId, FollowUserRequest followUserRequest)
+    public void followUser(Long userId, FollowerRequest followerRequest)
             throws NotFoundException, ConflictException {
-        Optional<User> optionalUser = this.userRepository.findById(followerId);
+        Optional<User> optionalUser = this.userRepository.findById(userId);
         if (!optionalUser.isPresent()) {
             throw new NotFoundException("user not found");
         }
 
-        FollowerId id = new FollowerId(followUserRequest.getUserId(), followerId);
+        if (userId == followerRequest.getUserId()) {
+            throw new ConflictException("can't following yourself");
+        }
+
+        FollowerId id = new FollowerId(userId, followerRequest.getUserId());
 
         if (followerRepository.existsById(id)) {
             throw new ConflictException("already following this user");
@@ -41,14 +45,18 @@ public class FollowerService {
         followerRepository.save(new Follower(id));
     }
 
-    public void unfollowUser(Long followerId, FollowUserRequest followUserRequest)
+    public void unfollowUser(Long userId, FollowerRequest followerRequest)
             throws NotFoundException {
-        Optional<User> optionalUser = this.userRepository.findById(followerId);
+        Optional<User> optionalUser = this.userRepository.findById(userId);
         if (!optionalUser.isPresent()) {
             throw new NotFoundException("user not found");
         }
 
-        FollowerId id = new FollowerId(followUserRequest.getUserId(), followerId);
+        if (userId == followerRequest.getUserId()) {
+            throw new ConflictException("can't unfollowing yourself");
+        }
+
+        FollowerId id = new FollowerId(userId, followerRequest.getUserId());
 
         followerRepository.deleteById(id);
     }
