@@ -20,6 +20,8 @@ public class User {
     private String username;
     private String email;
     private String password;
+    @Column(name = "is_active")
+    private boolean isActive = false;
 
     @Column(name = "created_at")
     private Instant createdAt;
@@ -62,6 +64,14 @@ public class User {
 
     public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
     }
 
     @PrePersist

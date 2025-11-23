@@ -40,7 +40,7 @@ public class Post {
     private Long userId;
 
     @Version
-    private Long version;
+    private int version;
 
     @ManyToOne
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
@@ -102,11 +102,11 @@ public class Post {
         this.userId = userId;
     }
 
-    public Long getVersion() {
+    public int getVersion() {
         return version;
     }
 
-    public void setVersion(Long version) {
+    public void setVersion(int version) {
         this.version = version;
     }
 

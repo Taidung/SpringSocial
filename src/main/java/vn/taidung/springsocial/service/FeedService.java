@@ -16,12 +16,11 @@ import org.springframework.stereotype.Service;
 import vn.taidung.springsocial.model.request.PostFeedFilter;
 import vn.taidung.springsocial.model.response.PostWithMetadata;
 import vn.taidung.springsocial.repository.PostRepository;
-import vn.taidung.springsocial.util.errors.GlobalExceptionHandler;
 
 @Service
 public class FeedService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FeedService.class);
 
     private final PostRepository postRepository;
 
