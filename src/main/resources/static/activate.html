@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Activation</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 520px; margin: 40px auto; padding: 0 16px; }
+    button { padding: 10px 16px; font-size: 14px; cursor: pointer; }
+    #status { margin-top: 16px; }
+    code { background: #f4f4f4; padding: 2px 4px; }
+  </style>
+</head>
+<body>
+  <h1>Account Activation</h1>
+  <button id="activate">Activate</button>
+  <div id="status"></div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    let token = params.get('token');
+    if (!token) {
+      const parts = window.location.pathname.split('/');
+      token = parts.pop() || parts.pop();
+    }
+
+    const info = document.getElementById('info');
+    const status = document.getElementById('status');
+    const btn = document.getElementById('activate');
+
+    if (!token) {
+      const status = document.getElementById('status');
+      status.textContent = 'Token not found in URL.';
+      btn.disabled = true;
+    }
+
+    btn.addEventListener('click', async () => {
+      status.textContent = 'Activating...';
+      try {
+        const res = await fetch('/v1/authentication/user/activate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token })
+        });
+        if (res.status === 204) {
+          status.textContent = 'Activation successful!';
+        } else {
+          const data = await res.json().catch(() => ({}));
+          status.textContent = 'Error: ' + (data.message || res.status);
+        }
+      } catch (e) {
+        status.textContent = 'Connection error: ' + e.message;
+      }
+    });
+  </script>
+</body>
+</html>

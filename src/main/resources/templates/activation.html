@@ -1,0 +1,20 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta name="viewport" content="width=device-width">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Finish Registration</title>
+  </head>
+  <body>
+    <p>Hi <span th:text="${username}">User</span>,</p>
+    <p>Thanks for signing up for SpringSocial. We're excited to have you on board!</p>
+    <p>Before you can start using SpringSocial, you need to confirm your email address. Click the link below to confirm your email address:</p>
+    <p>
+      <a th:href="${activationUrl}" th:text="${activationUrl}">activation link</a>
+    </p>
+    <p>If you want to activate your account manually, copy and paste the code from the link above.</p>
+    <p>If you didn't sign up for SpringSocial, you can safely ignore this email.</p>
+    <p>Thanks,</p>
+    <p>The SpringSocial Team</p>
+  </body>
+</html>

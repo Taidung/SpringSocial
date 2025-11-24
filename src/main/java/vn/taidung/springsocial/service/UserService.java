@@ -10,10 +10,12 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.mail.MessagingException;
 import vn.taidung.springsocial.model.User;
 import vn.taidung.springsocial.model.UserInvitation;
 import vn.taidung.springsocial.model.request.ActivateUserRequest;
@@ -32,17 +34,22 @@ public class UserService {
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
     private final UserInvitationRepository userInvitationRepository;
+    private final EmailService emailService;
     private final SecureRandom secureRandom = new SecureRandom();
 
     @Value("${app.invitation.ttl-seconds:259200}")
     private long invitationSeconds;
 
+    @Value("${app.frontend.activate-url:http://localhost:8080/activate.html?token=}")
+    private String activateBaseUrl;
+
     public UserService(UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder,
-            UserInvitationRepository userInvitationRepository) {
+            UserInvitationRepository userInvitationRepository, EmailService emailService) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
         this.userInvitationRepository = userInvitationRepository;
+        this.emailService = emailService;
     }
 
     public UserResponse getUserHandler(Long id) throws NotFoundException {
@@ -80,6 +87,13 @@ public class UserService {
         invitation.setUserId(user.getId());
         invitation.setExpiry(Instant.now().plusSeconds(invitationSeconds));
         userInvitationRepository.save(invitation);
+
+        String activationLink = activateBaseUrl + rawToken;
+        try {
+            emailService.sendActivationEmail(user.getEmail(), user.getUsername(), activationLink);
+        } catch (MailException | MessagingException ex) {
+            throw new RuntimeException("send activation email failed", ex);
+        }
 
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
         return new RegisterUserResponse(userResponse, rawToken);
