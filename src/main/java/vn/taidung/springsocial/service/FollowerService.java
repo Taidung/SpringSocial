@@ -1,14 +1,11 @@
 package vn.taidung.springsocial.service;
 
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import vn.taidung.springsocial.model.Follower;
 import vn.taidung.springsocial.model.FollowerId;
 import vn.taidung.springsocial.model.User;
-import vn.taidung.springsocial.model.request.FollowerRequest;
 import vn.taidung.springsocial.repository.FollowerRepository;
 import vn.taidung.springsocial.repository.UserRepository;
 import vn.taidung.springsocial.util.errors.ConflictException;
@@ -25,18 +22,18 @@ public class FollowerService {
     }
 
     @Transactional
-    public void followUser(Long userId, FollowerRequest followerRequest)
-            throws NotFoundException, ConflictException {
-        Optional<User> optionalUser = this.userRepository.findById(userId);
-        if (!optionalUser.isPresent()) {
-            throw new NotFoundException("user not found");
-        }
+    public void followUser(Long targetUserId, Long currentUserId) {
+        User target = userRepository.findByIdAndIsActiveTrue(targetUserId)
+                .orElseThrow(() -> new NotFoundException("user not found"));
 
-        if (userId == followerRequest.getUserId()) {
+        User current = userRepository.findByIdAndIsActiveTrue(currentUserId)
+                .orElseThrow(() -> new NotFoundException("user not found"));
+
+        if (target.getId() == current.getId()) {
             throw new ConflictException("can't following yourself");
         }
 
-        FollowerId id = new FollowerId(userId, followerRequest.getUserId());
+        FollowerId id = new FollowerId(target.getId(), current.getId());
 
         if (followerRepository.existsById(id)) {
             throw new ConflictException("already following this user");
@@ -45,18 +42,18 @@ public class FollowerService {
         followerRepository.save(new Follower(id));
     }
 
-    public void unfollowUser(Long userId, FollowerRequest followerRequest)
-            throws NotFoundException {
-        Optional<User> optionalUser = this.userRepository.findById(userId);
-        if (!optionalUser.isPresent()) {
-            throw new NotFoundException("user not found");
-        }
+    public void unfollowUser(Long targetUserId, Long currentUserId) {
+        User target = userRepository.findByIdAndIsActiveTrue(targetUserId)
+                .orElseThrow(() -> new NotFoundException("user not found"));
 
-        if (userId == followerRequest.getUserId()) {
+        User current = userRepository.findByIdAndIsActiveTrue(currentUserId)
+                .orElseThrow(() -> new NotFoundException("user not found"));
+
+        if (target.getId() == current.getId()) {
             throw new ConflictException("can't unfollowing yourself");
         }
 
-        FollowerId id = new FollowerId(userId, followerRequest.getUserId());
+        FollowerId id = new FollowerId(target.getId(), current.getId());
 
         followerRepository.deleteById(id);
     }

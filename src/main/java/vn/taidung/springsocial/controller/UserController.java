@@ -4,18 +4,17 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import vn.taidung.springsocial.model.request.FollowerRequest;
 import vn.taidung.springsocial.model.request.PostFeedFilter;
 import vn.taidung.springsocial.model.response.PostWithMetadata;
 import vn.taidung.springsocial.model.response.UserResponse;
@@ -50,28 +49,30 @@ public class UserController {
     @PutMapping("/users/{id}/follow")
     @ApiMessage("Follow a user")
     public ResponseEntity<Void> followUser(
-            @RequestBody FollowerRequest followUserRequest,
-            @PathVariable @Positive(message = "ID must be greater than zero") Long id) {
-        this.followerService.followUser(id, followUserRequest);
+            @PathVariable @Positive(message = "ID must be greater than zero") Long id,
+            Authentication authentication) {
+        Long currentUserId = userService.getUserByEmailHandler(authentication.getName()).getId();
+        this.followerService.followUser(id, currentUserId);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/users/{id}/unfollow")
     @ApiMessage("Unfollow a user")
     public ResponseEntity<Void> unfollowUser(
-            @RequestBody FollowerRequest followUserRequest,
-            @PathVariable @Positive(message = "ID must be greater than zero") Long id) {
-        this.followerService.unfollowUser(id, followUserRequest);
+            @PathVariable @Positive(message = "ID must be greater than zero") Long id,
+            Authentication authentication) {
+        Long currentUserId = userService.getUserByEmailHandler(authentication.getName()).getId();
+        this.followerService.unfollowUser(id, currentUserId);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/users/{id}/feed")
+    @GetMapping("/users/feed")
     @ApiMessage("Get user feed")
     public ResponseEntity<List<PostWithMetadata>> getUserFeed(
-            @PathVariable @Positive(message = "User ID must be greater than zero") Long id,
+            Authentication authentication,
             @Valid @ModelAttribute PostFeedFilter filter) {
-
-        Page<PostWithMetadata> feed = this.feedService.getUserFeedHandler(id, filter);
+        Long currentUserId = userService.getUserByEmailHandler(authentication.getName()).getId();
+        Page<PostWithMetadata> feed = this.feedService.getUserFeedHandler(currentUserId, filter);
         return ResponseEntity.ok(feed.getContent());
     }
 }

@@ -29,8 +29,9 @@ public class PostService {
     }
 
     @Transactional
-    public PostResponse createPostHandler(CreatePostRequest postRequest) {
+    public PostResponse createPostHandler(CreatePostRequest postRequest, Long userId) {
         Post post = this.modelMapper.map(postRequest, Post.class);
+        post.setUserId(userId);
         this.postRepository.save(post);
         return this.modelMapper.map(post, PostResponse.class);
     }

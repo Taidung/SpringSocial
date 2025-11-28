@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -113,5 +114,23 @@ public class GlobalExceptionHandler {
         LOGGER.error(ex.getMessage(), ex);
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(res);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<RestResponse<Object>> handleAuthenticationException(HttpServletRequest request,
+            Exception ex) {
+        ErrorResponse error = new ErrorResponse();
+        error.setTimestamp(Instant.now());
+        error.setPath(request.getServletPath());
+        error.addError(ex.getMessage());
+
+        RestResponse<Object> res = new RestResponse<Object>();
+        res.setStatusCode(HttpStatus.UNAUTHORIZED.value());
+        res.setErrors(error);
+        res.setMessage("Unauthorized");
+
+        LOGGER.error(ex.getMessage(), ex);
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
     }
 }

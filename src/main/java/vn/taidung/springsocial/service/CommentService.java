@@ -31,18 +31,20 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponse createCommentHandler(CreateCommentRequest commentRequest, Long postId) {
+    public CommentResponse createCommentHandler(CreateCommentRequest commentRequest, Long postId, Long userId) {
         if (!this.postRepository.existsById(postId)) {
             throw new NotFoundException("post not found");
         }
 
+        User user = userRepository.findByIdAndIsActiveTrue(userId)
+                .orElseThrow(() -> new NotFoundException("user not found"));
+
         Comment comment = new Comment();
         comment.setContent(commentRequest.getContent());
         comment.setPostId(postId);
-        comment.setUserId(commentRequest.getUserId());
+        comment.setUserId(userId);
         this.commentRepository.save(comment);
 
-        User user = this.userRepository.findById(commentRequest.getUserId()).get();
         CommentResponse response = this.modelMapper.map(comment, CommentResponse.class);
         response.setUser(new UserResponse(user.getId(), user.getUsername()));
         return response;

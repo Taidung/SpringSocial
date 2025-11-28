@@ -1,0 +1,14 @@
+package vn.taidung.springsocial.model.response;
+
+public class LoginUserResponse {
+    private String accessToken;
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+}

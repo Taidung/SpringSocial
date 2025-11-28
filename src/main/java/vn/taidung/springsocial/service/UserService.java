@@ -53,13 +53,22 @@ public class UserService {
     }
 
     public UserResponse getUserHandler(Long id) throws NotFoundException {
-        Optional<User> optionalUser = this.userRepository.findById(id);
+        Optional<User> optionalUser = this.userRepository.findByIdAndIsActiveTrue(id);
         if (!optionalUser.isPresent()) {
             throw new NotFoundException("user not found");
         }
         User user = optionalUser.get();
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
         return userResponse;
+    }
+
+    public User getUserByEmailHandler(String email) throws NotFoundException {
+        Optional<User> optionalUser = this.userRepository.findByEmailAndIsActiveTrue(email);
+        if (!optionalUser.isPresent()) {
+            throw new NotFoundException("user not found");
+        }
+        User user = optionalUser.get();
+        return user;
     }
 
     @Transactional

@@ -2,6 +2,7 @@ package vn.taidung.springsocial.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ import vn.taidung.springsocial.model.response.CommentResponse;
 import vn.taidung.springsocial.model.response.PostResponse;
 import vn.taidung.springsocial.service.CommentService;
 import vn.taidung.springsocial.service.PostService;
+import vn.taidung.springsocial.service.UserService;
 import vn.taidung.springsocial.util.annotation.ApiMessage;
 
 @RestController
@@ -29,16 +31,20 @@ import vn.taidung.springsocial.util.annotation.ApiMessage;
 public class PostController {
     private final PostService postService;
     private final CommentService commentService;
+    private final UserService userService;
 
-    public PostController(PostService postService, CommentService commentService) {
+    public PostController(PostService postService, CommentService commentService, UserService userService) {
         this.postService = postService;
         this.commentService = commentService;
+        this.userService = userService;
     }
 
     @PostMapping("/posts")
     @ApiMessage("Create a post")
-    public ResponseEntity<PostResponse> createPost(@RequestBody @Valid CreatePostRequest postRequest) {
-        PostResponse post = this.postService.createPostHandler(postRequest);
+    public ResponseEntity<PostResponse> createPost(@RequestBody @Valid CreatePostRequest postRequest,
+            Authentication authentication) {
+        Long currentUserId = userService.getUserByEmailHandler(authentication.getName()).getId();
+        PostResponse post = this.postService.createPostHandler(postRequest, currentUserId);
         return ResponseEntity.status(HttpStatus.CREATED).body(post);
     }
 
@@ -71,8 +77,10 @@ public class PostController {
     @ApiMessage("Add a comment to a post")
     public ResponseEntity<CommentResponse> createComment(
             @PathVariable @Positive(message = "Post ID must be greater than zero") Long id,
-            @RequestBody @Valid CreateCommentRequest commentRequest) {
-        CommentResponse commentResponse = this.commentService.createCommentHandler(commentRequest, id);
+            @RequestBody @Valid CreateCommentRequest commentRequest,
+            Authentication authentication) {
+        Long currentUserId = userService.getUserByEmailHandler(authentication.getName()).getId();
+        CommentResponse commentResponse = this.commentService.createCommentHandler(commentRequest, id, currentUserId);
         return ResponseEntity.status(HttpStatus.CREATED).body(commentResponse);
     }
 }
