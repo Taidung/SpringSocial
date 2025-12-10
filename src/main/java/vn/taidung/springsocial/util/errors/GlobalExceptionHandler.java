@@ -13,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import vn.taidung.springsocial.model.response.ErrorResponse;
@@ -132,5 +133,23 @@ public class GlobalExceptionHandler {
         LOGGER.error(ex.getMessage(), ex);
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<RestResponse<Object>> handleAuthorizationDenied(HttpServletRequest request,
+            AuthorizationDeniedException ex) {
+        ErrorResponse error = new ErrorResponse();
+        error.setTimestamp(Instant.now());
+        error.setPath(request.getServletPath());
+        error.addError("access denied");
+
+        RestResponse<Object> res = new RestResponse<>();
+        res.setStatusCode(HttpStatus.FORBIDDEN.value());
+        res.setErrors(error);
+        res.setMessage("Forbidden");
+
+        LOGGER.warn(ex.getMessage(), ex);
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
     }
 }

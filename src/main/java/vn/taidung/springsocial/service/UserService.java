@@ -22,6 +22,7 @@ import vn.taidung.springsocial.model.request.ActivateUserRequest;
 import vn.taidung.springsocial.model.request.RegisterUserRequest;
 import vn.taidung.springsocial.model.response.RegisterUserResponse;
 import vn.taidung.springsocial.model.response.UserResponse;
+import vn.taidung.springsocial.repository.RoleRepository;
 import vn.taidung.springsocial.repository.UserInvitationRepository;
 import vn.taidung.springsocial.repository.UserRepository;
 import vn.taidung.springsocial.util.errors.ConflictException;
@@ -36,6 +37,7 @@ public class UserService {
     private final UserInvitationRepository userInvitationRepository;
     private final EmailService emailService;
     private final SecureRandom secureRandom = new SecureRandom();
+    private final RoleRepository roleRepository;
 
     @Value("${app.invitation.ttl-seconds:259200}")
     private long invitationSeconds;
@@ -44,12 +46,14 @@ public class UserService {
     private String activateBaseUrl;
 
     public UserService(UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder,
-            UserInvitationRepository userInvitationRepository, EmailService emailService) {
+            UserInvitationRepository userInvitationRepository, EmailService emailService,
+            RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
         this.userInvitationRepository = userInvitationRepository;
         this.emailService = emailService;
+        this.roleRepository = roleRepository;
     }
 
     public UserResponse getUserHandler(Long id) throws NotFoundException {
@@ -86,6 +90,7 @@ public class UserService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setActive(false);
+        user.setRole(roleRepository.findByName("user").orElseThrow(() -> new NotFoundException("role not found")));
         userRepository.save(user);
 
         String rawToken = generateRawToken();

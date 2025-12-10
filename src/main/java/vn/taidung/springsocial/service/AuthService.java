@@ -2,6 +2,7 @@ package vn.taidung.springsocial.service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -47,11 +48,15 @@ public class AuthService {
         Instant now = Instant.now();
         Instant validity = now.plus(this.jwtExpiration, ChronoUnit.SECONDS);
 
+        var authorities = authentication.getAuthorities().stream()
+                .map(granted -> granted.getAuthority())
+                .collect(Collectors.toList());
+
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuedAt(now)
                 .expiresAt(validity)
                 .subject(authentication.getName())
-                .claim("springsocial", authentication)
+                .claim("roles", authorities)
                 .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();

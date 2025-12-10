@@ -1,7 +1,9 @@
 package vn.taidung.springsocial.controller;
 
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -56,19 +58,23 @@ public class PostController {
         return ResponseEntity.ok(postResponse);
     }
 
+    @PreAuthorize("@postPermission.canDelete(authentication, #id)")
     @DeleteMapping("/posts/{id}")
     @ApiMessage("Delete a post")
     public ResponseEntity<Void> deletePost(
-            @PathVariable @Positive(message = "Post ID must be greater than zero") Long id) {
+            @Param("id") @PathVariable @Positive(message = "Post ID must be greater than zero") Long id,
+            Authentication authentication) {
         this.postService.deletePostHandler(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("@postPermission.canUpdate(authentication, #id)")
     @PatchMapping("/posts/{id}")
     @ApiMessage("Update a post")
     public ResponseEntity<PostResponse> updatePost(
-            @PathVariable @Positive(message = "Post ID must be greater than zero") Long id,
-            @RequestBody UpdatePostRequest postRequest) {
+            @Param("id") @PathVariable @Positive(message = "Post ID must be greater than zero") Long id,
+            @RequestBody UpdatePostRequest postRequest,
+            Authentication authentication) {
         PostResponse post = this.postService.updatePostHandler(id, postRequest);
         return ResponseEntity.ok(post);
     }

@@ -3,11 +3,12 @@ package vn.taidung.springsocial.service;
 import java.util.Collections;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+
+import vn.taidung.springsocial.model.Role;
 
 @Component("userDetailsService")
 public class UserDetailsCustom implements UserDetailsService {
@@ -21,11 +22,16 @@ public class UserDetailsCustom implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         vn.taidung.springsocial.model.User user = this.userService.getUserByEmailHandler(email);
+        Role role = user.getRole();
+        String authority = role != null ? "ROLE_" + role.getName().toUpperCase() : "ROLE_USER";
+        Long roleLevel = role != null ? role.getLevel() : 1L;
 
-        return new User(
+        return new CustomUser(
+                user.getId(),
                 user.getEmail(),
                 user.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
+                roleLevel,
+                Collections.singletonList(new SimpleGrantedAuthority(authority)));
     }
 
 }

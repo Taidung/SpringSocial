@@ -1,5 +1,6 @@
 package vn.taidung.springsocial.model.response;
 
+import java.time.Instant;
 import java.util.List;
 
 public class PostResponse {
@@ -9,18 +10,20 @@ public class PostResponse {
     private String content;
     private List<String> tags;
     private List<CommentResponse> comments;
+    private Instant createdAt;
 
     public PostResponse() {
     }
 
     public PostResponse(Long id, Long userId, String title, String content, List<String> tags,
-            List<CommentResponse> comments) {
+            List<CommentResponse> comments, Instant createdAt) {
         this.id = id;
         this.userId = userId;
         this.title = title;
         this.content = content;
         this.tags = tags;
         this.comments = comments;
+        this.createdAt = createdAt;
     }
 
     public Long getId() {
@@ -69,6 +72,14 @@ public class PostResponse {
 
     public void setComments(List<CommentResponse> comments) {
         this.comments = comments;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
 }
